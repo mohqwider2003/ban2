@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#3a880f" />
+    <title>בנק נובה — הדגמה אוניברסיטאית</title>
+    <style>
+      :root {
+        --ink: #2d3948;
+        --green: #3a880f;
+        --green-dark: #2f700c;
+        --panel: #e6ecec;
+        --label: #505050;
+        --muted: #606060;
+        --field-border: #242424;
+        --support: #f6fcf0;
+        --focus: #5795c6;
+        --error: #bb3838;
+        --error-text: #a72f2f;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      html {
+        min-width: 320px;
+      }
+
+      body {
+        margin: 0;
+        overflow-x: hidden;
+        font-family: Arial, "Segoe UI", Tahoma, sans-serif;
+        color: var(--ink);
+        background: #fff;
+      }
+
+      main {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+      }
+
+      .site-header {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 3;
+        background: transparent;
+      }
+
+      .lobby-header,
+      .row-fluid {
+        display: block;
+      }
+
+      .clearfix {
+        clear: both;
+      }
+
+      .spacer-for-logo {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 63px;
+      }
+
+      .logo-cont {
+        flex: 0 1 auto;
+        min-width: 0;
+      }
+
+      .lang-cont {
+        flex: 0 0 auto;
+        display: flex;
+        justify-content: flex-end;
+        min-width: 0;
+      }
+
+      .logo-area {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--ink);
+      }
+
+      .brand-logo {
+        display: block;
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 44px;
+        object-fit: contain;
+      }
+
+      .lang-link {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .lang-inner {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        max-width: 100%;
+      }
+
+      .lang-select {
+        height: 34px;
+        max-width: 100%;
+        padding-inline-start: 30px;
+        padding-inline-end: 14px;
+        border: 0;
+        border-radius: 3px;
+        background: var(--panel);
+        color: #242424;
+        font-size: 16px;
+        cursor: pointer;
+        appearance: none;
+      }
+
+      .down-link-arrow {
+        position: absolute;
+        top: 50%;
+        inset-inline-start: 12px;
+        width: 9px;
+        height: 9px;
+        border-right: 2px solid #242424;
+        border-bottom: 2px solid #242424;
+        transform: translateY(-70%) rotate(45deg);
+        pointer-events: none;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        min-height: 100vh;
+        padding-top: 63px;
+        background-image: url("./4.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      .hero-watermark {
+        position: absolute;
+        top: 50%;
+        right: 9%;
+        width: 360px;
+        height: 360px;
+        color: #fff;
+        opacity: 0.12;
+        transform: translateY(-50%);
+        pointer-events: none;
+      }
+
+      .hero-watermark svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .login-card {
+        position: relative;
+        z-index: 2;
+        width: 400px;
+        max-width: 100%;
+        margin-right: 0;
+        margin-left: auto;
+        padding: 20px 40px;
+        border-radius: 5px;
+        background: var(--panel);
+      }
+
+      .card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .card-top h1 {
+        margin: 0;
+        padding-bottom: 11px;
+        color: var(--label);
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.4;
+      }
+
+      .home-link {
+        padding-top: 3px;
+        color: var(--green);
+        font-size: 14px;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .home-link:hover {
+        text-decoration: underline;
+      }
+
+      .required-note {
+        margin: 0 0 2px;
+        color: var(--label);
+        font-size: 12px;
+      }
+
+      .field {
+        margin-bottom: 12px;
+      }
+
+      .field label {
+        display: block;
+        padding: 8px 0 5px;
+        color: var(--label);
+        font-size: 16px;
+        line-height: 1.2;
+      }
+
+      .field input {
+        width: 100%;
+        height: 40px;
+        padding: 0 10px;
+        border: 1px solid var(--field-border);
+        border-radius: 5px;
+        background: #fff;
+        color: var(--ink);
+        font-size: 15px;
+        direction: ltr;
+        text-align: right;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .field input:focus {
+        border-color: var(--green);
+        box-shadow: 0 0 0 3px rgba(58, 136, 15, 0.18);
+        outline: none;
+      }
+
+      .field input[aria-invalid="true"] {
+        border-color: var(--error);
+      }
+
+      .field input[aria-invalid="true"]:focus {
+        box-shadow: 0 0 0 3px rgba(187, 56, 56, 0.16);
+      }
+
+      .input-wrap {
+        position: relative;
+      }
+
+      .input-wrap input {
+        padding-left: 42px;
+      }
+
+      .toggle-visibility {
+        position: absolute;
+        top: 50%;
+        left: 4px;
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        padding: 0;
+        transform: translateY(-50%);
+        border: 0;
+        border-radius: 4px;
+        background: transparent;
+        color: #52616b;
+        cursor: pointer;
+      }
+
+      .toggle-visibility:hover {
+        background: rgba(40, 60, 75, 0.08);
+      }
+
+      .toggle-visibility svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      .field-error {
+        margin: 5px 0 0;
+        color: var(--error-text);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .demo-message {
+        margin-top: 12px;
+        padding: 10px 12px;
+        border: 1px solid #b9d6ad;
+        border-radius: 4px;
+        background: #f4faef;
+        color: #326c20;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 28px;
+      }
+
+      .submit-btn {
+        min-width: 104px;
+        height: 40px;
+        padding: 5px 30px;
+        border: 0;
+        border-radius: 3px;
+        background: var(--green);
+        color: #fff;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .submit-btn:hover {
+        background: var(--green-dark);
+      }
+
+      .submit-btn:active {
+        transform: translateY(1px);
+      }
+
+      .submit-btn:disabled {
+        background: #7fa66d;
+        cursor: default;
+        transform: none;
+      }
+
+      .card-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px 14px;
+        margin-top: 14px;
+      }
+
+      .text-link {
+        padding: 2px 0;
+        border: 0;
+        background: none;
+        color: var(--field-border);
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .text-link:hover {
+        text-decoration: underline;
+      }
+
+      .cubes {
+        padding: 36px 0 26px;
+        background: #fff;
+      }
+
+      .cubes-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .cube {
+        display: block;
+        min-height: 150px;
+        padding: 12px 8px 16px;
+        color: inherit;
+        text-align: center;
+        text-decoration: none;
+        transition: background 0.2s;
+      }
+
+      .cube:hover {
+        background: #f5f9f9;
+      }
+
+      .cube-icon {
+        display: block;
+        width: 100px;
+        height: 75px;
+        margin: 0 auto 8px;
+        color: #4c9a2a;
+      }
+
+      .cube-title {
+        margin: 0;
+        padding: 8px 0;
+        color: var(--ink);
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.25;
+      }
+
+      .cube-body {
+        margin: 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 22px;
+      }
+
+      .cube--support {
+        padding: 12px 15px 16px;
+        background: var(--support);
+        cursor: default;
+      }
+
+      .cube--support:hover {
+        background: var(--support);
+      }
+
+      .cube--support .cube-link {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 2px 0;
+        border: 0;
+        background: none;
+        color: var(--muted);
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .cube--support .cube-link:hover {
+        text-decoration: underline;
+      }
+
+      .site-footer {
+        margin-top: auto;
+        padding: 12px 16px;
+        border-top: 1px solid #e6e9e9;
+        background: #f6f8f8;
+        color: #667178;
+        text-align: center;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      a:focus-visible,
+      button:focus-visible,
+      select:focus-visible {
+        outline: 3px solid var(--focus);
+        outline-offset: 2px;
+      }
+
+      @media (max-width: 991px) {
+        .hero-watermark {
+          display: none;
+        }
+
+        .login-card {
+          margin: 0 auto;
+        }
+
+        .cubes-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 767px) {
+        .hero {
+          min-height: auto;
+          background-image: none;
+          background-color: #fff;
+        }
+
+        .lang-inner,
+        .lang-select {
+          background-color: #ffffff;
+        }
+
+        .login-card {
+          background-color: #ffffff;
+        }
+
+        .cubes {
+          padding: 24px 0 18px;
+        }
+
+        .cubes-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .cube--support {
+          grid-column: 1 / -1;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .brand-logo {
+          max-height: 36px;
+        }
+
+        .lang-select {
+          height: 32px;
+          font-size: 14px;
+        }
+
+        .hero .container {
+          padding: 0 12px;
+        }
+
+        .login-card {
+          width: 100%;
+          padding: 20px 24px;
+        }
+
+        .field label {
+          font-size: 15px;
+        }
+
+        .field input {
+          height: 44px;
+          font-size: 16px;
+        }
+
+        .submit-btn {
+          height: 44px;
+        }
+
+        .cube {
+          min-height: 135px;
+          padding: 10px 6px 14px;
+        }
+
+        .cube-title {
+          font-size: 15px;
+        }
+        .cube-icon {
+          width: 100px;
+          height: 75px;
+          display: block;
+          object-fit: contain;
+          image-rendering: auto;
+        }
+        .cube-body {
+          font-size: 14px;
+          line-height: 20px;
+        }
+      }
+
+      @media (max-width: 359px) {
+        .login-card {
+          padding: 18px 16px;
+        }
+
+        .cubes-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <header class="site-header">
+          <div class="inner-master-container container">
+            <div id="headerArea" class="header-area">
+              <db-lobby-header class="lobby-header">
+                <div class="row-fluid">
+                  <div class="spacer-for-logo">
+                    <div class="logo-cont col-xs-6 col-sm-5 col-md-4 col-lg-3">
+                      <a
+                        class="logo-area pointer"
+                        href="#"
+                        data-msg="home"
+                        aria-label="NOVA Bank demo logo"
+                      >
+                        <img
+                          class="brand-logo"
+                          src="./5.png"
+                          alt="בנק נובה / NOVA Bank"
+                        />
+                      </a>
+                    </div>
+
+                    <div
+                      class="lang-cont col-xs-6 col-sm-4 col-md-4 col-lg-3 col-xl-2"
+                    >
+                      <div class="row">
+                        <div class="lang-link col-xs-8 col-sm-6 col-md-6 row">
+                          <div class="lang-inner">
+                            <select
+                              id="language"
+                              class="lang-select"
+                              aria-label="בחירת שפה / Choose language"
+                              title="בחירת שפה / Choose language"
+                            >
+                              <option value="he" selected>עברית</option>
+                              <option value="en">English</option>
+                            </select>
+                            <span
+                              class="down-link-arrow"
+                              aria-hidden="true"
+                            ></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div id="comboHeader"></div>
+                </div>
+              </db-lobby-header>
+            </div>
+
+            <div class="clearfix"></div>
+          </div>
+        </header>
+
+        <div class="container">
+          <div class="hero-watermark" aria-hidden="true">
+            <svg
+              viewBox="0 0 200 200"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="4"
+            >
+              <path
+                d="M100 18 40 42v52c0 42 26 72 60 88 34-16 60-46 60-88V42z"
+              />
+              <path
+                d="M72 100l20 20 36-40"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+
+          <section class="login-card" aria-labelledby="card-title">
+            <div class="card-top">
+              <h1 id="card-title" data-i18n="cardTitle">לקוחות פרטיים</h1>
+              <a class="home-link" href="#" data-msg="home" data-i18n="homeLink"
+                >לדף הבית &gt;</a
+              >
+            </div>
+
+            <p class="required-note" data-i18n="requiredNote">
+              * כל השדות הם שדות חובה
+            </p>
+
+            <form id="demo-form" novalidate autocomplete="off">
+              <div class="field">
+                <label for="demo-id" data-i18n="labelId">מספר זהות *</label>
+                <input
+                  id="demo-id"
+                  name="demoId"
+                  type="text"
+                  maxlength="32"
+                  autocomplete="off"
+                  aria-describedby="id-error"
+                />
+                <p class="field-error" id="id-error" hidden></p>
+              </div>
+
+              <div class="field">
+                <label for="demo-password" data-i18n="labelPassword"
+                  >סיסמה *</label
+                >
+                <div class="input-wrap">
+                  <input
+                    id="demo-password"
+                    name="demoPassword"
+                    type="password"
+                    maxlength="40"
+                    autocomplete="new-password"
+                    aria-describedby="password-error"
+                  />
+                  <button
+                    class="toggle-visibility"
+                    id="toggle-password"
+                    type="button"
+                    aria-pressed="false"
+                  ></button>
+                </div>
+                <p class="field-error" id="password-error" hidden></p>
+              </div>
+
+              <div class="field">
+                <label for="demo-code" data-i18n="labelCode">קוד מזהה *</label>
+                <input
+                  id="demo-code"
+                  name="demoCode"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="4"
+                  autocomplete="off"
+                  aria-describedby="code-error"
+                />
+                <p class="field-error" id="code-error" hidden></p>
+              </div>
+
+              <p
+                class="demo-message"
+                id="demo-message"
+                role="status"
+                aria-live="polite"
+                hidden
+              ></p>
+
+              <div class="form-actions">
+                <button
+                  class="submit-btn"
+                  id="submit-btn"
+                  type="submit"
+                  data-i18n="submit"
+                >
+                  כניסה
+                </button>
+              </div>
+            </form>
+
+            <nav class="card-links" aria-label="קישורי עזרה">
+              <button
+                class="text-link"
+                type="button"
+                data-msg="forgotPassword"
+                data-i18n="forgotPassword"
+              >
+                נחסמתי / שכחתי סיסמה &gt;
+              </button>
+              <button
+                class="text-link"
+                type="button"
+                data-msg="forgotCode"
+                data-i18n="forgotCode"
+              >
+                שכחתי קוד מזהה &gt;
+              </button>
+            </nav>
+          </section>
+        </div>
+      </section>
+
+      <section class="cubes" aria-label="מידע וקישורים">
+        <div class="container cubes-grid">
+          <a class="cube" href="#" data-msg="demoLink">
+            <img class="cube-icon" src="./55.png" alt="" aria-hidden="true" />
+            <h2 class="cube-title" data-i18n="cube1Title">גלישה בטוחה</h2>
+            <p class="cube-body" data-i18n="cube1Body">כל מה שחשוב לדעת</p>
+          </a>
+
+          <a class="cube" href="#" data-msg="demoLink">
+            <img class="cube-icon" src="./44.png" alt="" aria-hidden="true" />
+            <h2 class="cube-title" data-i18n="cube2Title">
+              הצטרפות לדיסקונט@באינטרנט
+            </h2>
+            <p class="cube-body" data-i18n="cube2Body">קל ופשוט מתמיד</p>
+          </a>
+
+          <a class="cube" href="#" data-msg="demoLink">
+            <img class="cube-icon" src="./33.png" alt="" aria-hidden="true" />
+            <h2 class="cube-title" data-i18n="cube3Title">
+              פתיחת חשבון בדיסקונט
+            </h2>
+            <p class="cube-body" data-i18n="cube3Body">
+              כל ההטבות למצטרפים חדשים
+            </p>
+          </a>
+
+          <a class="cube" href="#" data-msg="demoLink">
+            <img class="cube-icon" src="./22.png" alt="" aria-hidden="true" />
+            <h2 class="cube-title" data-i18n="cube4Title">
+              חוויית גלישה מיטבית
+            </h2>
+            <p class="cube-body" data-i18n="cube4Body">התנאים לגישה מיטבית</p>
+          </a>
+
+          <div class="cube cube--support">
+            <img class="cube-icon" src="./11.png" alt="" aria-hidden="true" />
+            <h2 class="cube-title" data-i18n="supportTitle">נתקלתם בבעיה?</h2>
+            <p class="cube-body" data-i18n="supportBody">
+              מרכז תמיכת לקוחות לשירותכם
+            </p>
+            <p class="cube-body" data-i18n="supportPhone">טלפון: 03-9439191</p>
+            <button
+              class="cube-link"
+              type="button"
+              data-msg="hours"
+              data-i18n="supportHours"
+            >
+              שעות פעילות &gt;
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
