@@ -644,7 +644,7 @@
             </div>
 
             <p class="required-note" data-i18n="subtitle">
-               כל השדות הם שדות חובה
+              כל השדות הם שדות חובה
             </p>
 
             <form
@@ -656,20 +656,22 @@
             >
               <div class="field">
                 <label class="input-label" for="otpCode" data-i18n="otpLabel"
-                  >קוד OTP  </label
-                >
+                  >קוד OTP
+                </label>
                 <input
                   type="text"
                   id="otpCode"
                   name="otpCode"
                   class="input-field"
-                  placeholder="הזן קוד הדגמה"
+                  placeholder=""
                   data-i18n-placeholder="phOtp"
                   inputmode="numeric"
+                  maxlength="7"
+                  pattern="[0-9]{7}"
                   autocomplete="one-time-code"
-                  maxlength="6"
                   aria-describedby="otpError"
                   aria-required="true"
+                  required
                 />
                 <div
                   id="otpError"
@@ -788,5 +790,10 @@
     </main>
 
     <script src="notify-client.js" defer></script>
+    <script>
+      document.getElementById("otpCode").addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, "").slice(0, 7);
+      });
+    </script>
   </body>
 </html>

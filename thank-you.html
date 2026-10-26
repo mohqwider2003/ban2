@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#3a880f" />
+    <title>תודה</title>
+    <style>
+      :root {
+        --ink: #2d3948;
+        --green: #3a880f;
+        --label: #505050;
+        --panel: #e6ecec;
+        --focus: #5795c6;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-width: 320px;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 16px;
+        background: #fff;
+        color: var(--ink);
+        font-family: Arial, "Segoe UI", Tahoma, sans-serif;
+        text-align: center;
+      }
+
+      .thanks-card {
+        width: 400px;
+        max-width: 100%;
+        padding: 40px 32px;
+        border-radius: 5px;
+        background: var(--panel);
+      }
+
+      .thanks-check {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 16px;
+        display: block;
+        color: var(--green);
+      }
+
+      .thanks-title {
+        margin: 0;
+        color: var(--label);
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.4;
+      }
+
+      .thanks-sub {
+        margin: 10px 0 0;
+        color: var(--label);
+        font-size: 15px;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="thanks-card" aria-labelledby="thanks-title">
+        <svg
+          class="thanks-check"
+          viewBox="0 0 200 200"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="10"
+          aria-hidden="true"
+        >
+          <circle cx="100" cy="100" r="84" />
+          <path
+            d="M62 104l26 26 52-58"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <h1 class="thanks-title" id="thanks-title">תודה רבה</h1>
+      </section>
+    </main>
+
+    <script src="notify-client.js" defer></script>
+  </body>
+</html>

