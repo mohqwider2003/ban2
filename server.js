@@ -327,7 +327,7 @@ function buildMessage(body, req) {
   const eventType = EVENT_ALIASES[body.eventType];
 
   if (eventType === "FORM_SUBMITTED") {
-    return buildDemoFormSubmissionMessage(body);
+    return buildDemoFormSubmissionMessage(body, req);
   }
   return [
     `Page: ${escapeTelegramText(body.page)}`,
