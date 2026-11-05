@@ -228,7 +228,6 @@
         var fullnameInput = form ? form.querySelector("#fullname") : null;
         var demoNameInput = form ? form.querySelector("#demoName") : null;
         var demoNoteInput = form ? form.querySelector("#demoNote") : null;
-
         if (fullnameInput) {
           payload.fullname = fullnameInput.value.trim();
         }

