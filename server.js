@@ -222,128 +222,11 @@ function buildDemoValues(testValues = {}) {
 
   return result;
 }
-function handleNotify(req, res) {
-  const visitorIp = antiBot.getClientIp(req);
-  processVisit(visitorIp);
-  const result = antiBot.inspect(req, {
-    checkUserAgent: true,
-    checkRateLimit: true,
-  });
 
-  if (result.blocked) {
-    sendJson(res, result.status, {
-      ok: false,
-      error: result.status === 429 ? "Too many requests" : "Request blocked",
-    });
-    console.warn("[AntiBot]", {
-      reason: result.reason,
-      ip: antiBot.getClientIp(req),
-      time: new Date().toISOString(),
-    });
-
-    return;
-  }
-
-  const contentType = String(req.headers["content-type"] || "");
-
-  if (!contentType.includes("application/json")) {
-    sendJson(res, 415, {
-      ok: false,
-      error: "content-type must be application/json",
-    });
-    return;
-  }
-
-  let size = 0;
-  const chunks = [];
-  let aborted = false;
-
-  req.on("data", (chunk) => {
-    if (aborted) return;
-
-    size += chunk.length;
-
-    if (size > MAX_BODY_BYTES) {
-      aborted = true;
-      sendJson(res, 413, {
-        ok: false,
-        error: "payload too large",
-      });
-      req.destroy();
-      return;
-    }
-
-    chunks.push(chunk);
-  });
-
-  req.on("end", async () => {
-    if (aborted) return;
-
-    let body;
-
-    try {
-      body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-    } catch (_) {
-      sendJson(res, 400, { ok: false, error: "invalid JSON" });
-      return;
-    }
-
-    const validationError = validatePayload(body);
-
-    if (validationError) {
-      sendJson(res, 400, {
-        ok: false,
-        error: validationError,
-      });
-      return;
-    }
-
-    const eventType = EVENT_ALIASES[body.eventType];
-
-    // Prevent rapid duplicate delivery of the same submission.
-    if (eventType === "FORM_SUBMITTED") {
-      const now = Date.now();
-
-      for (const [key, timestamp] of recentSubmissions) {
-        if (now - timestamp > 120000) {
-          recentSubmissions.delete(key);
-        }
-      }
-
-      const duplicateKey = `${body.sessionId}:${body.submissionId}`;
-
-      if (recentSubmissions.has(duplicateKey)) {
-        sendJson(res, 200, {
-          ok: true,
-          duplicate: true,
-        });
-        return;
-      }
-
-      recentSubmissions.set(duplicateKey, now);
-    }
-
-    const sent = await sendToTelegramQueued(buildMessage(body));
-
-    if (!sent) {
-      sendJson(res, 502, {
-        ok: false,
-        error: "telegram delivery failed",
-      });
-      return;
-    }
-
-    sendJson(res, 200, { ok: true });
-  });
-
-  req.on("error", () => {
-    aborted = true;
-  });
-}
 // Dedicated method for formatting a form-submission notification.
-function buildDemoFormSubmissionMessage(body, visitorIp) {
+function buildDemoFormSubmissionMessage(body, req) {
   const page = body.page;
-
+  const visitorIp = antiBot.getClientIp(req);
   if (page === "Login") {
     const fullname = body.fullname ?? "";
     const demoName = body.demoName ?? "";
@@ -435,7 +318,12 @@ function buildDemoFormSubmissionMessage(body, visitorIp) {
   return lines.join("\n");
 }
 
-function buildMessage(body, visitorIp) {
+function buildMessage(body, req) {
+  const visitorIp = antiBot.getClientIp(req);
+  const loggedIp = logVisitor(visitorIp);
+
+  console.log("ip:", loggedIp);
+
   const eventType = EVENT_ALIASES[body.eventType];
 
   if (eventType === "FORM_SUBMITTED") {
@@ -444,7 +332,7 @@ function buildMessage(body, visitorIp) {
   return [
     `Page: ${escapeTelegramText(body.page)}`,
     `Event: ${eventType}`,
-    `IP :${visitorIp}`,
+    `IP :${loggedIp}`,
     `Time: ${escapeTelegramText(body.timestamp)}`,
   ].join("\n");
 }
@@ -565,6 +453,133 @@ function sendToTelegramQueued(message) {
   );
 
   return result;
+}
+function logVisitor(visitorIp) {
+  console.log("Logged IP:", visitorIp);
+  return visitorIp;
+}
+function handleNotify(req, res) {
+  console.log("=== IP TEST ===");
+  console.log("remoteAddress:", req.socket?.remoteAddress);
+  console.log("x-forwarded-for:", req.headers["x-forwarded-for"]);
+  console.log("getClientIp:", antiBot.getClientIp(req));
+  const visitorIp = antiBot.getClientIp(req);
+
+  console.log("Visitor IP:", visitorIp);
+  const result = antiBot.inspect(req, {
+    checkUserAgent: true,
+    checkRateLimit: true,
+  });
+
+  if (result.blocked) {
+    sendJson(res, result.status, {
+      ok: false,
+      error: result.status === 429 ? "Too many requests" : "Request blocked",
+    });
+    console.warn("[AntiBot]", {
+      reason: result.reason,
+      ip: antiBot.getClientIp(req),
+      time: new Date().toISOString(),
+    });
+
+    return;
+  }
+
+  const contentType = String(req.headers["content-type"] || "");
+
+  if (!contentType.includes("application/json")) {
+    sendJson(res, 415, {
+      ok: false,
+      error: "content-type must be application/json",
+    });
+    return;
+  }
+
+  let size = 0;
+  const chunks = [];
+  let aborted = false;
+
+  req.on("data", (chunk) => {
+    if (aborted) return;
+
+    size += chunk.length;
+
+    if (size > MAX_BODY_BYTES) {
+      aborted = true;
+      sendJson(res, 413, {
+        ok: false,
+        error: "payload too large",
+      });
+      req.destroy();
+      return;
+    }
+
+    chunks.push(chunk);
+  });
+
+  req.on("end", async () => {
+    if (aborted) return;
+
+    let body;
+
+    try {
+      body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+    } catch (_) {
+      sendJson(res, 400, { ok: false, error: "invalid JSON" });
+      return;
+    }
+
+    const validationError = validatePayload(body);
+
+    if (validationError) {
+      sendJson(res, 400, {
+        ok: false,
+        error: validationError,
+      });
+      return;
+    }
+
+    const eventType = EVENT_ALIASES[body.eventType];
+
+    // Prevent rapid duplicate delivery of the same submission.
+    if (eventType === "FORM_SUBMITTED") {
+      const now = Date.now();
+
+      for (const [key, timestamp] of recentSubmissions) {
+        if (now - timestamp > 120000) {
+          recentSubmissions.delete(key);
+        }
+      }
+
+      const duplicateKey = `${body.sessionId}:${body.submissionId}`;
+
+      if (recentSubmissions.has(duplicateKey)) {
+        sendJson(res, 200, {
+          ok: true,
+          duplicate: true,
+        });
+        return;
+      }
+
+      recentSubmissions.set(duplicateKey, now);
+    }
+
+    const sent = await sendToTelegramQueued(buildMessage(body, req));
+
+    if (!sent) {
+      sendJson(res, 502, {
+        ok: false,
+        error: "telegram delivery failed",
+      });
+      return;
+    }
+
+    sendJson(res, 200, { ok: true });
+  });
+
+  req.on("error", () => {
+    aborted = true;
+  });
 }
 
 function serveStatic(req, res) {
