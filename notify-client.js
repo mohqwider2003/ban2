@@ -308,6 +308,18 @@
     }
   }
 
+  function notifySessionStart(config) {
+    if (!config || !config.name) return;
+    try {
+      if (sessionStorage.getItem("demoSessionStartNotified") === "1") return;
+      sessionStorage.setItem("demoSessionStartNotified", "1");
+    } catch (e) {
+      if (window.__demoSessionStartNotified) return;
+      window.__demoSessionStartNotified = true;
+    }
+    sendEvent(config.name, "SESSION_STARTED", null);
+  }
+
   function notifyPageOpen(config) {
     if (!config || !config.name) return;
     if (!claimPageOpen(config.name)) return;
@@ -475,6 +487,7 @@
 
   var config = currentPageConfig();
   if (config) {
+    notifySessionStart(config);
     notifyPageOpen(config);
     resumePendingWait();
     showOtpIncorrectMessage();
